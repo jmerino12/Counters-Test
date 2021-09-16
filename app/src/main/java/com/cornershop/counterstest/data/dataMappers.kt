@@ -5,7 +5,7 @@ import com.cornershop.counterstest.data.database.Counter as LocalCounter
 import com.cornershop.counterstest.data.server.TheCounterDbResult as ServerCounter
 
 fun Counter.toRoomCounter(): LocalCounter = LocalCounter(
-    id, title, count
+    id!!, title!!, count!!
 )
 
 fun LocalCounter.toDomainCounter(): Counter = Counter(

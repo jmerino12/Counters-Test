@@ -12,4 +12,10 @@ class TheCounterDbDataSource(private val theCounterDb: TheCounterDb) : RemoteDat
         }
     }
 
+    override suspend fun addProduct(product: Counter): List<Counter> {
+        return theCounterDb.service.saveCounterDbRemote(product).map {
+            it.toDomainCounter()
+        }
+    }
+
 }

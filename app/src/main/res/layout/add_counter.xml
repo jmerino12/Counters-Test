@@ -18,14 +18,31 @@
             app:title="@string/create_counter"
             app:titleTextColor="@color/black">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSave"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:text="@string/save"
-                android:textColor="?colorPrimary" />
+                android:layout_gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSave"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="@string/save"
+                    android:textColor="?colorPrimary" />
+
+                <ProgressBar
+                    android:id="@+id/progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="?colorPrimary"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+
         </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -48,6 +65,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>

@@ -5,12 +5,14 @@ import com.cornershop.counterstest.data.database.CounterDatabase
 import com.cornershop.counterstest.data.database.RoomDataSource
 import com.cornershop.counterstest.data.server.TheCounterDb
 import com.cornershop.counterstest.data.server.TheCounterDbDataSource
+import com.cornershop.counterstest.ui.addcounter.AddCounter
+import com.cornershop.counterstest.ui.addcounter.AddCounterViewModel
 import com.cornershop.counterstest.ui.main.MainScreen
 import com.cornershop.counterstest.ui.main.MainViewModel
-import com.cornershop.counterstest.ui.welcome.WelcomeActivity
 import com.jmb.data.repository.CounterRepository
 import com.jmb.data.source.LocalDataSource
 import com.jmb.data.source.RemoteDataSource
+import com.jmb.usecases.AddProduct
 import com.jmb.usecases.GetCounters
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -40,14 +42,13 @@ val dataModule = module {
 }
 
 private val scopesModule = module {
-   scope(named<MainScreen>()) {
+    scope(named<MainScreen>()) {
         viewModel { MainViewModel(get()) }
         scoped { GetCounters(get()) }
     }
 
-    /*scope(named<DetailActivity>()) {
-        viewModel { (id: Int) -> DetailViewModel(id, get(), get(), get()) }
-        scoped { FindMovieById(get()) }
-        scoped { ToggleMovieFavorite(get()) }
-    }*/
+    scope(named<AddCounter>()) {
+        viewModel { AddCounterViewModel(get()) }
+        scoped { AddProduct(get()) }
+    }
 }

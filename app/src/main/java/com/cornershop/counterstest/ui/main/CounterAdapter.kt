@@ -1,8 +1,6 @@
 package com.cornershop.counterstest.ui.main
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.cornershop.counterstest.databinding.ItemCounterBinding
@@ -47,6 +45,7 @@ class CounterAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Counter, position: Int) {
             binding.count.text = item.count.toString()
+            binding.nameItem.text = item.title
         }
     }
 }

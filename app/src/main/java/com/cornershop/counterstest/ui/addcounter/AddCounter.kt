@@ -1,18 +1,28 @@
 package com.cornershop.counterstest.ui.addcounter
 
+import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Observer
 import com.cornershop.counterstest.R
 import com.cornershop.counterstest.databinding.AddCounterBinding
+import com.cornershop.counterstest.ui.common.ScopeDialogFragment
+import com.cornershop.counterstest.ui.common.UiModel
+import com.jmb.domain.Counter
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AddCounter : DialogFragment() {
+
+class AddCounter : ScopeDialogFragment() {
 
     private var _binding: AddCounterBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: AddCounterViewModel by viewModel()
+
 
     companion object {
         const val TAG = "Add Counter"
@@ -26,25 +36,46 @@ class AddCounter : DialogFragment() {
         )
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        viewModel.model.observe(this, Observer(::updateUI))
+        return super.onCreateDialog(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         _binding = AddCounterBinding.inflate(inflater, container, false)
         binding.toolbar.setNavigationIcon(R.drawable.ic_close)
         binding.toolbar.setNavigationOnClickListener {
-            dismiss()
+            // dismiss()
         }
         binding.toolbar.title = getString(R.string.create_counter)
         binding.btnSave.setOnClickListener {
-            Toast.makeText(
-                requireContext(),
-                "Evento ocurrió exitosamente!",
-                Toast.LENGTH_SHORT
-            ).show()
-            dismiss()
+            if (binding.product.text!!.isNotEmpty()) {
+                viewModel.addProduct(Counter(null, binding.product.text.toString().trim(), null))
+            }
         }
         return binding.root
+    }
+
+    fun updateUI(model: UiModel<List<Counter>>) {
+        binding.progress.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
+
+        when (model) {
+            is UiModel.Content -> {
+                if (model.data.isEmpty()) {
+                    this.dismiss()
+                }
+            }
+            is UiModel.Error -> {
+                Log.e(tag, model.error.toString())
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
