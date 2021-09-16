@@ -1,0 +1,6 @@
+include ':app'
+rootProject.name = "Counters Test"
+include ':data'
+include ':domain'
+include ':useCases'
+include ':testShared'
