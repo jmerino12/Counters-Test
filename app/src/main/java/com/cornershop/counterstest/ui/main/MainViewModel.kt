@@ -22,7 +22,7 @@ class MainViewModel(private val getCounters: GetCounters) : ViewModel() {
             return _model
         }
 
-    private fun getCounters() {
+    fun getCounters() {
         uiScope.launch {
             _model.value = UiModel.Loading
             try {
