@@ -10,11 +10,11 @@ import com.cornershop.counterstest.ui.main.CounterAdapter
 class CounterKeyProvider(private val adapter: CounterAdapter) :
     ItemKeyProvider<String>(SCOPE_CACHED) {
     override fun getKey(position: Int): String? {
-        return adapter.currentList[position].id
+        return adapter.counters[position].id
     }
 
     override fun getPosition(key: String): Int {
-        return adapter.currentList.indexOfFirst { counter -> counter.id == key }
+        return adapter.counters.indexOfFirst { counter -> counter.id == key }
     }
 }
 

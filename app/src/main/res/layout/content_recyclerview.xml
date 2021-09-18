@@ -16,7 +16,7 @@
             android:id="@+id/rvCounter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:itemCount="3"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_counter" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

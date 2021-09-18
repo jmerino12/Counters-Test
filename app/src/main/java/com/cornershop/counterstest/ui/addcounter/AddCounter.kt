@@ -1,6 +1,7 @@
 package com.cornershop.counterstest.ui.addcounter
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,10 +25,14 @@ class AddCounter : ScopeDialogFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AddCounterViewModel by viewModel()
-
+    private lateinit var listener: OnReloadData
 
     companion object {
         const val TAG = "Add Counter"
+    }
+
+    interface OnReloadData {
+        fun onReload(boolean: Boolean = false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +72,8 @@ class AddCounter : ScopeDialogFragment() {
 
         when (model) {
             is UiModel.Content -> {
-                this.dismiss()
+                listener.onReload(boolean = true)
+                dismiss()
             }
             is UiModel.Error -> {
                 requireActivity().alert {
@@ -77,6 +83,15 @@ class AddCounter : ScopeDialogFragment() {
                 }
                 Log.e(tag, model.error.toString())
             }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            listener = context as OnReloadData
+        } catch (e: Error) {
+            Log.e(tag, e.message.toString())
         }
     }
 

@@ -2,13 +2,11 @@ package com.cornershop.counterstest.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.view.ActionMode
-import androidx.core.text.bold
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.selection.SelectionTracker
@@ -27,15 +25,17 @@ import org.koin.androidx.scope.ScopeActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
-    CounterAdapter.OnOptionsCounterListener {
+class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
+    SwipeRefreshLayout.OnRefreshListener, AddCounter.OnReloadData {
+
     private var actionMode: ActionMode? = null
+    private lateinit var tracker: SelectionTracker<String>
+
     private lateinit var binding: ActivityMainScreenBinding
     private lateinit var adapter: CounterAdapter
     private lateinit var rvObserver: RvEmptyObserver
-    private lateinit var tracker: SelectionTracker<String>
-    private lateinit var list: ArrayList<Counter>
     lateinit var counterUpdating: Counter
+    private lateinit var list: ArrayList<Counter>
 
 
     private val viewModel: MainViewModel by viewModel()
@@ -43,21 +43,24 @@ class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(R.style.Theme_CountersNormal)
         binding = ActivityMainScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        setSupportActionBar(binding.toolbar)
-        supportActionBar!!.setDisplayShowTitleEnabled(false)
 
         adapter = CounterAdapter(this)
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.modelCounter.observe(this, Observer(::updateUiCounter))
 
+        binding.addCounter.setOnClickListener {
+            val fragment = AddCounter()
+            fragment.show(
+                supportFragmentManager.beginTransaction(),
+                AddCounter.TAG
+            )
+        }
+
+
         binding.rvCounterInclude.swiperefresh.setColorSchemeResources(R.color.orange)
         binding.rvCounterInclude.swiperefresh.setOnRefreshListener(this)
-        binding.contentError.btnRety.setOnClickListener { getCounters() }
-
         binding.rvCounterInclude.rvCounter.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.rvCounterInclude.rvCounter.adapter = adapter
@@ -71,7 +74,6 @@ class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
         ).build()
 
         adapter.selectionTracker = tracker
-
 
         tracker.addObserver(object : SelectionTracker.SelectionObserver<String>() {
             override fun onSelectionChanged() {
@@ -87,22 +89,11 @@ class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
             }
         })
 
-        binding.addCounter.setOnClickListener {
-            val fragment = AddCounter()
-            fragment.show(
-                supportFragmentManager.beginTransaction(),
-                AddCounter.TAG
-            )
-        }
+        binding.contentError.btnRety.setOnClickListener { getCounters() }
         list = ArrayList()
     }
 
-    private fun updateContextualActionBarTitle() {
-        actionMode?.title = "${tracker.selection.size()} seleccionados"
-    }
-
     private fun updateUi(model: UiModel<List<Counter>>) {
-        list.clear()
         binding.progress.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
         binding.contentError.root.isVisible = model is UiModel.Error
         binding.noContent.root.isVisible = model is UiModel.Content
@@ -114,31 +105,18 @@ class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
                     rvObserver
                 )
                 list = model.data as ArrayList<Counter>
-                adapter.submitList(model.data)
-                if (model.data.isNotEmpty()) {
-                    binding.counterItems.text = SpannableStringBuilder().bold {
-                        append(
-                            "${
-                                getString(
-                                    R.string.n_items,
-                                    model.data.size
-                                )
-                            } "
-                        )
-                    }.append(getString(R.string.n_times, model.data.size))
-                }
+                adapter.counters = model.data
+                Log.i("Main", model.data.toString())
             }
             is UiModel.Error -> {
                 Log.e("Main", model.error.toString())
             }
         }
         binding.rvCounterInclude.swiperefresh.isRefreshing = false
-
     }
 
     private fun updateUiCounter(model: UiModel<List<Counter>>) {
         binding.progress.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
-
         when (model) {
             is UiModel.Content -> {
                 getCounters()
@@ -161,6 +139,11 @@ class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
         }
 
     }
+
+    private fun updateContextualActionBarTitle() {
+        actionMode?.title = "${tracker.selection.size()} seleccionados"
+    }
+
 
     private val actionModeCallBack = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -230,11 +213,6 @@ class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
         viewModel.getCounters()
     }
 
-    override fun onResume() {
-        super.onResume()
-        getCounters()
-    }
-
     override fun onRefresh() {
         getCounters()
     }
@@ -253,9 +231,8 @@ class MainScreen : ScopeActivity(), SwipeRefreshLayout.OnRefreshListener,
         }
     }
 
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        Log.i("dada", item.toString())
-        return true
+    override fun onReload(boolean: Boolean) {
+        if (boolean) getCounters()
     }
-
 }
+
