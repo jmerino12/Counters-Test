@@ -1,10 +1,7 @@
 package com.cornershop.counterstest.data.server
 
 import com.jmb.domain.Counter
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.HTTP
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface TheCounterDbService {
 
@@ -23,8 +20,9 @@ interface TheCounterDbService {
     suspend fun decrementalCounter(@Body params: Counter)
             : List<TheCounterDbResult>
 
+    @FormUrlEncoded
     @HTTP(method = "DELETE", path = "counter", hasBody = true)
-    suspend fun deleteCounter(@Body params: Counter)
+    suspend fun deleteCounter(@Field("id") id: String)
             : List<TheCounterDbResult>
 
 }

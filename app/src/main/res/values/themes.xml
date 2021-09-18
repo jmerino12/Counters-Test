@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.CountersNormal" parent="Theme.MaterialComponents.DayNight">
+    <style name="Theme.CountersNormal" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/orange</item>
         <item name="colorOnPrimary">@color/black</item>
@@ -20,7 +20,6 @@
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.MyTheme.LargeComponent
         </item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
-
     </style>
 
     <style name="Theme.CountersWelcome" parent="Theme.CountersNormal">

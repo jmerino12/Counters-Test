@@ -7,5 +7,5 @@ interface RemoteDataSource {
     suspend fun addProduct(product: Counter): List<Counter>
     suspend fun increseCounter(product: Counter): List<Counter>
     suspend fun decreseCounter(product: Counter): List<Counter>
-    suspend fun deleteCounter(product: Counter): List<Counter>
+    suspend fun deleteCounter(id: String): List<Counter>
 }

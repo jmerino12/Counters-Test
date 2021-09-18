@@ -34,6 +34,9 @@ class MainViewModel(
     private val _modelCounter = MutableLiveData<UiModel<List<Counter>>>()
     val modelCounter: LiveData<UiModel<List<Counter>>> get() = _modelCounter
 
+    private val _modelDeleteCounter = MutableLiveData<UiModel<List<Counter>>>()
+    val modelDeleteCounter: LiveData<UiModel<List<Counter>>> get() = _modelDeleteCounter
+
     fun getCounters() {
         uiScope.launch {
             _model.value = UiModel.Loading
@@ -67,13 +70,13 @@ class MainViewModel(
         }
     }
 
-    fun deleteCounter(product: Counter) {
+    fun deleteCounter(id: String) {
         uiScope.launch {
-            _modelCounter.value = UiModel.Loading
+            _modelDeleteCounter.value = UiModel.Loading
             try {
-                _modelCounter.value = UiModel.Content(deleteCounter.invoke(product))
+                _modelDeleteCounter.value = UiModel.Content(deleteCounter.invoke(id))
             } catch (e: Exception) {
-                _modelCounter.value = UiModel.Error(e)
+                _modelDeleteCounter.value = UiModel.Error(e)
             }
         }
     }

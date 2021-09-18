@@ -12,5 +12,5 @@ class CounterRepository(
     suspend fun addProduct(product: Counter) = remoteDataSource.addProduct(product)
     suspend fun increseCounter(product: Counter) = remoteDataSource.increseCounter(product)
     suspend fun decreseCounter(product: Counter) = remoteDataSource.decreseCounter(product)
-    suspend fun deleteCounter(product: Counter) = remoteDataSource.deleteCounter(product)
+    suspend fun deleteCounter(id: String) = remoteDataSource.deleteCounter(id)
 }

@@ -14,6 +14,9 @@ import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.transition.Fade
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
 import com.cornershop.counterstest.R
 import com.cornershop.counterstest.databinding.ActivityMainScreenBinding
 import com.cornershop.counterstest.ui.addcounter.AddCounter
@@ -36,6 +39,9 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
     private lateinit var rvObserver: RvEmptyObserver
     lateinit var counterUpdating: Counter
     private lateinit var list: ArrayList<Counter>
+    private var incrementOrDecrement: Boolean = false
+    private var show: Boolean = false
+    var transition: Transition = Fade()
 
 
     private val viewModel: MainViewModel by viewModel()
@@ -49,6 +55,7 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
         adapter = CounterAdapter(this)
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.modelCounter.observe(this, Observer(::updateUiCounter))
+        viewModel.modelDeleteCounter.observe(this, Observer(::updateUiCounterDelete))
 
         binding.addCounter.setOnClickListener {
             val fragment = AddCounter()
@@ -81,8 +88,11 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
                     if (actionMode == null) {
                         actionMode = startSupportActionMode(actionModeCallBack)
                     }
-                    binding.appbar.visibility = View.GONE
                     updateContextualActionBarTitle()
+                    transition.duration = 250
+                    transition.addTarget(binding.searchView.id)
+                    TransitionManager.beginDelayedTransition(binding.root, transition)
+                    binding.searchView.visibility = View.GONE
                 } else {
                     actionMode?.finish()
                 }
@@ -115,6 +125,33 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
         binding.rvCounterInclude.swiperefresh.isRefreshing = false
     }
 
+    private fun updateUiCounterDelete(model: UiModel<List<Counter>>) {
+        binding.progress.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
+        when (model) {
+            is UiModel.Content -> {
+                getCounters()
+            }
+            is UiModel.Error -> {
+                errorDeleteCounter()
+                Log.e("error", model.error.toString())
+            }
+        }
+    }
+
+    private fun errorDeleteCounter() {
+        if (!show) {
+            alert {
+                setTitle(
+                    getString(R.string.error_deleting_counter_title)
+                )
+                setMessage(getString(R.string.connection_error_description))
+                positiveButton(text = getString(R.string.ok)) { }
+
+            }
+            show = true
+        }
+    }
+
     private fun updateUiCounter(model: UiModel<List<Counter>>) {
         binding.progress.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
         when (model) {
@@ -122,22 +159,24 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
                 getCounters()
             }
             is UiModel.Error -> {
+                Log.e("error", model.error.toString())
                 alert {
                     setTitle(
                         getString(
                             R.string.error_updating_counter_title,
                             counterUpdating.title,
-                            counterUpdating.count
+                            if (incrementOrDecrement) counterUpdating.count + 1
+                            else counterUpdating.count - 1
                         )
                     )
                     setMessage(getString(R.string.connection_error_description))
                     negativeButton(text = getString(R.string.retry)) { }
                     positiveButton(text = getString(R.string.dismiss)) { }
 
+
                 }
             }
         }
-
     }
 
     private fun updateContextualActionBarTitle() {
@@ -172,7 +211,8 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
         override fun onDestroyActionMode(mode: ActionMode?) {
             tracker.clearSelection()
             actionMode = null
-            binding.appbar.visibility = View.VISIBLE
+            binding.searchView.visibility = View.VISIBLE
+
         }
 
     }
@@ -190,9 +230,9 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
         alert {
             setTitle(getString(R.string.delete_x_question, delete))
             positiveButton(getString(R.string.delete)) {
-                tracker.selection.map { viewModel.deleteCounter(Counter(id = it)) }
+                tracker.selection.map { viewModel.deleteCounter(it) }
                 actionMode!!.finish()
-
+                show = false
             }
             negativeButton(getString(R.string.cancel)) {}
         }
@@ -214,12 +254,14 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
     }
 
     override fun onRefresh() {
+        adapter.clearData()
         getCounters()
     }
 
     override fun increment(item: Counter, position: Int) {
         viewModel.increseCounter(item)
         counterUpdating = item
+        incrementOrDecrement = true
         adapter.notifyItemChanged(position)
     }
 
@@ -227,7 +269,8 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
         if (item.count > 0) {
             viewModel.decreseCounter(item)
             counterUpdating = item
-
+            incrementOrDecrement = false
+            adapter.notifyItemChanged(position)
         }
     }
 

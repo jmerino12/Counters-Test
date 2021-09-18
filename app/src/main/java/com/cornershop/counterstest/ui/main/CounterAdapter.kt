@@ -15,8 +15,8 @@ import com.jmb.domain.Counter
 class CounterAdapter(private val listener: OnOptionsCounterListener) :
     RecyclerView.Adapter<CounterAdapter.ViewHolder>() {
 
-    var counters: List<Counter> by basicDiffUtil(
-        emptyList(),
+    var counters: ArrayList<Counter> by basicDiffUtil(
+        ArrayList(),
         areItemsTheSame = { old, new -> old.id == new.id }
     )
 
@@ -51,6 +51,11 @@ class CounterAdapter(private val listener: OnOptionsCounterListener) :
     }
 
     override fun getItemCount(): Int = counters.size
+
+    public fun clearData() {
+        counters.clear()
+        notifyDataSetChanged()
+    }
 
 
     inner class ViewHolder(

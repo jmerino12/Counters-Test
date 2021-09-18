@@ -30,8 +30,8 @@ class TheCounterDbDataSource(private val theCounterDb: TheCounterDb) : RemoteDat
         }
     }
 
-    override suspend fun deleteCounter(product: Counter): List<Counter> {
-        return theCounterDb.service.deleteCounter(product).map {
+    override suspend fun deleteCounter(id: String): List<Counter> {
+        return theCounterDb.service.deleteCounter(id).map {
             it.toDomainCounter()
         }
     }
