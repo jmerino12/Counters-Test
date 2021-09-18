@@ -18,4 +18,22 @@ class TheCounterDbDataSource(private val theCounterDb: TheCounterDb) : RemoteDat
         }
     }
 
+    override suspend fun increseCounter(product: Counter): List<Counter> {
+        return theCounterDb.service.incrementalCounter(product).map {
+            it.toDomainCounter()
+        }
+    }
+
+    override suspend fun decreseCounter(product: Counter): List<Counter> {
+        return theCounterDb.service.decrementalCounter(product).map {
+            it.toDomainCounter()
+        }
+    }
+
+    override suspend fun deleteCounter(product: Counter): List<Counter> {
+        return theCounterDb.service.deleteCounter(product).map {
+            it.toDomainCounter()
+        }
+    }
+
 }

@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.CountersNormal" parent="Theme.MaterialComponents.DayNight">
         <!-- Primary brand color. -->
@@ -12,6 +12,15 @@
         <item name="android:textColorTertiary">@color/light_gray</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorSecondary</item>
+
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.MyTheme.SmallComponent
+        </item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.MyTheme.MediumComponentn
+        </item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.MyTheme.LargeComponent
+        </item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
+
     </style>
 
     <style name="Theme.CountersWelcome" parent="Theme.CountersNormal">
@@ -20,5 +29,25 @@
 
     <style name="FullScreenDialog" parent="ShapeAppearanceOverlay.MaterialComponents.MaterialCalendar.Window.Fullscreen">
         <item name="android:windowAnimationStyle">@style/Animation.AppCompat.Dialog</item>
+    </style>
+
+    <style name="MaterialCardNoBackground" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@android:color/transparent</item>
+        <item name="cardCornerRadius">@null</item>
+        <item name="cardElevation">@null</item>
+        <item name="shapeAppearance">@null</item>
+    </style>
+
+    <style name="ToolBarNoBackground" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:background">@null</item>
+        <item name="android:theme">@null</item>
+        <item name="android:minHeight">@null</item>
+        <item name="materialThemeOverlay">@null</item>
+
+    </style>
+
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorSecondary">@color/white</item>
     </style>
 </resources>

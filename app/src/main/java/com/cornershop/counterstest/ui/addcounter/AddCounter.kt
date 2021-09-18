@@ -12,6 +12,8 @@ import com.cornershop.counterstest.R
 import com.cornershop.counterstest.databinding.AddCounterBinding
 import com.cornershop.counterstest.ui.common.ScopeDialogFragment
 import com.cornershop.counterstest.ui.common.UiModel
+import com.cornershop.counterstest.ui.common.alert
+import com.cornershop.counterstest.ui.common.positiveButton
 import com.jmb.domain.Counter
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -48,12 +50,12 @@ class AddCounter : ScopeDialogFragment() {
         _binding = AddCounterBinding.inflate(inflater, container, false)
         binding.toolbar.setNavigationIcon(R.drawable.ic_close)
         binding.toolbar.setNavigationOnClickListener {
-            // dismiss()
+            dismiss()
         }
         binding.toolbar.title = getString(R.string.create_counter)
         binding.btnSave.setOnClickListener {
             if (binding.product.text!!.isNotEmpty()) {
-                viewModel.addProduct(Counter(null, binding.product.text.toString().trim(), null))
+                viewModel.addProduct(Counter(null, binding.product.text.toString().trim()))
             }
         }
         return binding.root
@@ -61,14 +63,18 @@ class AddCounter : ScopeDialogFragment() {
 
     fun updateUI(model: UiModel<List<Counter>>) {
         binding.progress.visibility = if (model is UiModel.Loading) View.VISIBLE else View.GONE
+        binding.btnSave.visibility = if (model is UiModel.Loading) View.GONE else View.VISIBLE
 
         when (model) {
             is UiModel.Content -> {
-                if (model.data.isEmpty()) {
-                    this.dismiss()
-                }
+                this.dismiss()
             }
             is UiModel.Error -> {
+                requireActivity().alert {
+                    setTitle(getString(R.string.error_creating_counter_title))
+                    setMessage(getString(R.string.connection_error_description))
+                    positiveButton(getString(R.string.ok)) { }
+                }
                 Log.e(tag, model.error.toString())
             }
         }

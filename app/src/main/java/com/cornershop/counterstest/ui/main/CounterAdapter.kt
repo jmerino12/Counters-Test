@@ -1,19 +1,28 @@
 package com.cornershop.counterstest.ui.main
 
+
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.selection.ItemDetailsLookup
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.cornershop.counterstest.databinding.ItemCounterBinding
-import com.cornershop.counterstest.ui.common.basicDiffUtil
 import com.jmb.domain.Counter
 
-class CounterAdapter :
-    RecyclerView.Adapter<CounterAdapter.ViewHolder>() {
+class CounterAdapter(private val listener: OnOptionsCounterListener) :
+    ListAdapter<Counter, CounterAdapter.ViewHolder>(CounterDiffCallback()) {
 
-    var counters: List<Counter> by basicDiffUtil(
-        emptyList(),
-        areItemsTheSame = { old, new -> old.id == new.id }
-    )
+    var selectionTracker: SelectionTracker<String>? = null
+
+    interface OnOptionsCounterListener {
+        fun increment(item: Counter, position: Int)
+        fun decrement(item: Counter, position: Int)
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val viewBinding =
@@ -26,26 +35,64 @@ class CounterAdapter :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        when (holder) {
-            is ViewHolder -> {
-                holder.bind(counters[position], position)
-            }
-            else -> {
-                throw IllegalStateException("ViewType no declarado ")
-            }
+        val counter = getItem(position)
+        selectionTracker?.let {
+            holder.bind(counter, position, it.isSelected(counter.id))
         }
     }
-
-    override fun getItemCount(): Int = counters.size
 
 
     inner class ViewHolder(
         private val binding: ItemCounterBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Counter, position: Int) {
+        val details
+            get() = object : ItemDetailsLookup.ItemDetails<String>() {
+                override fun getPosition(): Int = bindingAdapterPosition
+
+                override fun getSelectionKey(): String? = getItem(bindingAdapterPosition).id
+
+            }
+
+        fun bind(item: Counter, position: Int, selected: Boolean) {
             binding.count.text = item.count.toString()
             binding.nameItem.text = item.title
+
+            binding.root.isChecked = selected
+            binding.group.visibility = if (!selected) View.VISIBLE else View.GONE
+
+            if (item.count <= 0) {
+                binding.btnLess.isEnabled = false
+                binding.btnLess.setColorFilter(Color.rgb(136, 139, 144));
+            } else {
+                binding.btnLess.isEnabled = true
+                binding.btnLess.setColorFilter(Color.rgb(255, 149, 0));
+            }
+
+
+            binding.btnPlus.setOnClickListener { listener.increment(item, position) }
+            binding.btnLess.setOnClickListener { listener.decrement(item, position) }
         }
+
     }
+
+    class CounterDiffCallback : DiffUtil.ItemCallback<Counter>() {
+        override fun areItemsTheSame(oldItem: Counter, newItem: Counter): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Counter, newItem: Counter): Boolean {
+            return oldItem == newItem
+        }
+
+    }
+
+    /* fun getItemsCount(): Int {
+         var counter = 0
+         counters.forEach {
+             counter += it.count
+         }
+         return counter
+     }*/
+
 }

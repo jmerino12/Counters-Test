@@ -16,10 +16,11 @@
         android:theme="@style/Theme.CountersNormal">
         <activity
             android:name=".ui.main.MainScreen"
+            android:theme="@style/Theme.CountersWelcome"
             android:exported="true" />
         <activity
             android:name=".ui.welcome.WelcomeActivity"
-            android:theme="@style/Theme.CountersWelcome">
+            android:theme="@style/Theme.CountersNormal">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
