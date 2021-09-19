@@ -10,11 +10,11 @@ import com.cornershop.counterstest.ui.main.CounterAdapter
 class CounterKeyProvider(private val adapter: CounterAdapter) :
     ItemKeyProvider<String>(SCOPE_CACHED) {
     override fun getKey(position: Int): String? {
-        return adapter.counters[position].id
+        return adapter.currentList[position].id
     }
 
     override fun getPosition(key: String): Int {
-        return adapter.counters.indexOfFirst { counter -> counter.id == key }
+        return adapter.currentList.indexOfFirst { counter -> counter.id == key }
     }
 }
 
@@ -23,7 +23,7 @@ class CounterDetailsLookup(private val recyclerView: RecyclerView) : ItemDetails
         val view: View? = recyclerView.findChildViewUnder(e.x, e.y)
         if (view != null) {
             val holder = recyclerView.getChildViewHolder(view)
-            if (holder is CounterAdapter.ViewHolder) {
+            if (holder is CounterAdapter.CounterViewHolder) {
                 return holder.details
             }
         }

@@ -24,6 +24,7 @@ import com.cornershop.counterstest.ui.common.*
 import com.cornershop.counterstest.ui.utils.CounterDetailsLookup
 import com.cornershop.counterstest.ui.utils.CounterKeyProvider
 import com.jmb.domain.Counter
+import kotlinx.coroutines.*
 import org.koin.androidx.scope.ScopeActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -115,7 +116,8 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
                     rvObserver
                 )
                 list = model.data as ArrayList<Counter>
-                adapter.counters = model.data
+                adapter.addHeaderAndSubmitList(model.data)
+                adapter.notifyItemRangeChanged(0, model.data.size)
                 Log.i("Main", model.data.toString())
             }
             is UiModel.Error -> {
@@ -233,10 +235,17 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
                 tracker.selection.map { viewModel.deleteCounter(it) }
                 actionMode!!.finish()
                 show = false
+                GlobalScope.launch {
+                    withContext(Dispatchers.Main) {
+                        delay(100)
+                        onRefresh()
+                    }
+
+                }
+
             }
             negativeButton(getString(R.string.cancel)) {}
         }
-
     }
 
     private fun shared() {

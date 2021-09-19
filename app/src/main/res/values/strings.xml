@@ -55,4 +55,5 @@
     <string name="btnInc">Increment</string>
     <string name="btnDecrement">Decrement</string>
     <string name="Name">Name</string>
+    <string name="preference_welcome">FIRST_TIME_IN_APP</string>
 </resources>
