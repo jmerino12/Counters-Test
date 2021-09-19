@@ -11,17 +11,11 @@ interface CounterDao {
     @Query("SELECT COUNT(id) FROM Counter")
     fun counterCount(): Int
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCounters(counters: List<Counter>)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertCounter(counter: Counter)
-
-    @Update
-    fun update(counter: Counter)
-
-    @Delete
-    fun deleteCounter(counter: Counter)
+    @Query("DELETE FROM Counter WHERE id = :id")
+    fun deleteCounter(id: String)
 
     @Delete
     fun deleteCounters(counter: List<Counter>)
