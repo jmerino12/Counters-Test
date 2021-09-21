@@ -7,6 +7,7 @@ interface LocalDataSource {
     suspend fun saveCounter(counter: List<Counter>)
     suspend fun getCounters(): List<Counter>
     suspend fun deleteCounters(counter: List<Counter>)
+    suspend fun deleteCountersServerEmpty()
     suspend fun deleteCounter(id: String)
 
 }

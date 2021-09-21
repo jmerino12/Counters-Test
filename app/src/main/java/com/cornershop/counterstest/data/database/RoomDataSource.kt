@@ -27,6 +27,10 @@ class RoomDataSource(private val db: CounterDatabase) : LocalDataSource {
         counterDao.deleteCounters(counter.map { it.toRoomCounter() })
     }
 
+    override suspend fun deleteCountersServerEmpty() {
+        counterDao.deleteCounters()
+    }
+
     override suspend fun deleteCounter(id: String) = withContext(Dispatchers.IO) {
         counterDao.deleteCounter(id)
     }

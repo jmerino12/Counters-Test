@@ -11,6 +11,7 @@ class CounterRepository(
 
     suspend fun getCounters(): List<Counter> {
         val counter = remoteDataSource.getCounters()
+        if (counter.isEmpty()) localDataSource.deleteCountersServerEmpty()
         localDataSource.saveCounter(counter)
         return localDataSource.getCounters()
     }

@@ -121,6 +121,10 @@ class SearchAdapter(private val listener: OnOptionsCounterListener) :
         return counter
     }
 
+    fun getListCount(): Int {
+        return this.currentList.size
+    }
+
 
     inner class CounterViewHolder(
         private val binding: ItemCounterBinding
@@ -199,6 +203,8 @@ class SearchAdapter(private val listener: OnOptionsCounterListener) :
                 val list = results!!.values as ArrayList<Counter>
                 addHeaderAndSubmitList(list)
                 notifyItemRangeChanged(0, list.size)
+
+
             }
 
         }

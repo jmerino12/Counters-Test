@@ -19,4 +19,7 @@ interface CounterDao {
 
     @Delete
     fun deleteCounters(counter: List<Counter>)
+
+    @Query("DELETE FROM COUNTER")
+    fun deleteCounters()
 }
