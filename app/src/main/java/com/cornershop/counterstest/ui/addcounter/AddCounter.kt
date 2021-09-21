@@ -3,11 +3,14 @@ package com.cornershop.counterstest.ui.addcounter
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import com.cornershop.counterstest.R
 import com.cornershop.counterstest.databinding.AddCounterBinding
@@ -15,6 +18,7 @@ import com.cornershop.counterstest.ui.common.ScopeDialogFragment
 import com.cornershop.counterstest.ui.common.UiModel
 import com.cornershop.counterstest.ui.common.alert
 import com.cornershop.counterstest.ui.common.positiveButton
+import com.cornershop.counterstest.ui.example.ExampleCounterDialog
 import com.jmb.domain.Counter
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -38,7 +42,7 @@ class AddCounter : ScopeDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(
-            DialogFragment.STYLE_NORMAL,
+            STYLE_NORMAL,
             R.style.FullScreenDialog
         )
     }
@@ -63,6 +67,11 @@ class AddCounter : ScopeDialogFragment() {
                 viewModel.addProduct(Counter(null, binding.product.text.toString().trim()))
             }
         }
+        binding.counterExample.movementMethod = LinkMovementMethod.getInstance()
+        binding.counterExample.setText(
+            setClickablePart(getString(R.string.create_counter_disclaimer)),
+            TextView.BufferType.SPANNABLE
+        )
         return binding.root
     }
 
@@ -84,6 +93,21 @@ class AddCounter : ScopeDialogFragment() {
                 Log.e(tag, model.error.toString())
             }
         }
+    }
+
+    private fun setClickablePart(str: String): SpannableStringBuilder {
+        val spannableStringBuilder = SpannableStringBuilder(str)
+        val index = str.indexOf("See examples")
+        spannableStringBuilder.setSpan(object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                val fragment = ExampleCounterDialog()
+                fragment.show(
+                    childFragmentManager.beginTransaction(),
+                    ExampleCounterDialog.TAG
+                )
+            }
+        }, index, str.length, 0)
+        return spannableStringBuilder
     }
 
     override fun onAttach(context: Context) {

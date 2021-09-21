@@ -21,6 +21,7 @@ import com.cornershop.counterstest.R
 import com.cornershop.counterstest.databinding.ActivityMainScreenBinding
 import com.cornershop.counterstest.ui.addcounter.AddCounter
 import com.cornershop.counterstest.ui.common.*
+import com.cornershop.counterstest.ui.search.SearchCounter
 import com.cornershop.counterstest.ui.utils.CounterDetailsLookup
 import com.cornershop.counterstest.ui.utils.CounterKeyProvider
 import com.jmb.domain.Counter
@@ -99,7 +100,15 @@ class MainScreen : ScopeActivity(), CounterAdapter.OnOptionsCounterListener,
                 }
             }
         })
-
+        val view = binding.searchView.findViewById(androidx.appcompat.R.id.search_src_text) as View
+        view.setOnClickListener {
+            val fragment = SearchCounter(list)
+            fragment.arguments = Bundle()
+            fragment.show(
+                supportFragmentManager.beginTransaction(),
+                SearchCounter.TAG
+            )
+        }
         binding.contentError.btnRety.setOnClickListener { getCounters() }
         list = ArrayList()
     }

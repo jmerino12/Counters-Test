@@ -2,6 +2,12 @@ package com.cornershop.counterstest.ui.common
 
 import android.content.Context
 import android.content.DialogInterface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.style.ClickableSpan
+import android.text.style.UnderlineSpan
+import android.view.View
 import androidx.annotation.StyleRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +32,30 @@ inline fun <VH : RecyclerView.ViewHolder, T> RecyclerView.Adapter<VH>.basicDiffU
             override fun getNewListSize(): Int = new.size
         }).dispatchUpdatesTo(this@basicDiffUtil)
     }
+
+
+fun CharSequence.makeUnderlineClickable(listener: (index: Int) -> Unit): SpannableString {
+    val spannedString = SpannableString(this)
+    spannedString.getSpans(0, length, UnderlineSpan::class.java)
+        ?.forEachIndexed { index, underlineSpan ->
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    listener.invoke(index)
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    ds.isUnderlineText = true
+                }
+            }
+            spannedString.setSpan(
+                clickableSpan,
+                spannedString.getSpanStart(underlineSpan),
+                spannedString.getSpanEnd(underlineSpan),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+    return spannedString
+}
 
 fun Context.alert(@StyleRes style: Int = 0, dialogBuilder: MaterialAlertDialogBuilder.() -> Unit) {
     MaterialAlertDialogBuilder(this, style)

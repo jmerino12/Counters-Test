@@ -30,6 +30,11 @@
         <item name="android:windowAnimationStyle">@style/Animation.AppCompat.Dialog</item>
     </style>
 
+    <style name="FullScreenDialogTransparent" parent="ShapeAppearanceOverlay.MaterialComponents.MaterialCalendar.Window.Fullscreen">
+        <item name="android:windowAnimationStyle">@style/Animation.AppCompat.Dialog</item>
+        <item name="android:windowBackground">#70000000</item>
+    </style>
+
     <style name="MaterialCardNoBackground" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">@android:color/transparent</item>
         <item name="cardCornerRadius">@null</item>
@@ -48,5 +53,11 @@
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="colorPrimary">@color/orange</item>
         <item name="colorSecondary">@color/white</item>
+    </style>
+
+    <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">@null</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="cornerRadius">20dp</item>
     </style>
 </resources>

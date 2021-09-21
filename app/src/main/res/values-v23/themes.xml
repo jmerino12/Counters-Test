@@ -32,4 +32,8 @@
         <item name="colorSecondary">@color/white</item>
     </style>
 
+    <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">#fff</item>
+        <item name="boxStrokeWidth">0dp</item>
+    </style>
 </resources>

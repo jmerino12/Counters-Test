@@ -56,4 +56,6 @@
     <string name="btnDecrement">Decrement</string>
     <string name="Name">Name</string>
     <string name="preference_welcome">FIRST_TIME_IN_APP</string>
+    <string name="drinks">Drinks</string>
+    <string name="food">Food</string>
 </resources>

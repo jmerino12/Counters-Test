@@ -1,4 +1,4 @@
-package com.cornershop.counterstest.ui.main
+package com.cornershop.counterstest.ui.search
 
 
 import android.graphics.Color
@@ -6,9 +6,9 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.core.text.bold
-import androidx.recyclerview.selection.ItemDetailsLookup
-import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +24,9 @@ import kotlinx.coroutines.withContext
 private const val HEADER_VIEW_TYPE = 1
 private const val TYPE_ITEM = 2
 
-class CounterAdapter(private val listener: OnOptionsCounterListener) :
-    ListAdapter<CounterAdapter.DataItem, RecyclerView.ViewHolder>(CounterDiffCallback()) {
+class SearchAdapter(private val listener: OnOptionsCounterListener) :
+    ListAdapter<SearchAdapter.DataItem, RecyclerView.ViewHolder>(CounterDiffCallback()),
+    Filterable {
 
 
     class CounterDiffCallback : DiffUtil.ItemCallback<DataItem>() {
@@ -41,23 +42,17 @@ class CounterAdapter(private val listener: OnOptionsCounterListener) :
 
     private val adapterScope = CoroutineScope(Dispatchers.IO)
     private lateinit var listCounter: ArrayList<Counter>
-    private lateinit var listCounterCopy: ArrayList<Counter>
+    lateinit var listCounterCopy: ArrayList<Counter>
 
-    var selectionTracker: SelectionTracker<String>? = null
 
     fun addHeaderAndSubmitList(list: List<Counter>) {
         adapterScope.launch {
-            if (list.isNotEmpty()) {
-                listCounter = list as ArrayList<Counter>
-                listCounterCopy = listCounter
-                val items = listOf(DataItem.Header) + list.map { DataItem.CounterItem(it) }
-                withContext(Dispatchers.Main) {
-                    submitList(items)
-                }
+            listCounter = list as ArrayList<Counter>
+            val items = listOf(DataItem.Header) + list.map { DataItem.CounterItem(it) }
+            withContext(Dispatchers.Main) {
+                submitList(items)
             }
-
         }
-
     }
 
     interface OnOptionsCounterListener {
@@ -97,7 +92,7 @@ class CounterAdapter(private val listener: OnOptionsCounterListener) :
                 holder.bind(
                     getItem(position) as DataItem.CounterItem,
                     position,
-                    selectionTracker!!.isSelected(getItem(position).id)
+                    false
                 )
             }
             is HeaderViewHolder -> {
@@ -126,23 +121,11 @@ class CounterAdapter(private val listener: OnOptionsCounterListener) :
         return counter
     }
 
-    fun clearData() {
-        submitList(null)
-        notifyDataSetChanged()
-    }
-
 
     inner class CounterViewHolder(
         private val binding: ItemCounterBinding
     ) :
         RecyclerView.ViewHolder(binding.root) {
-        val details
-            get() = object : ItemDetailsLookup.ItemDetails<String>() {
-                override fun getPosition(): Int = bindingAdapterPosition
-
-                override fun getSelectionKey(): String? = getItem(bindingAdapterPosition).id
-
-            }
 
         fun bind(item: DataItem.CounterItem, position: Int, selected: Boolean) {
             binding.count.text = item.counter.count.toString()
@@ -188,6 +171,37 @@ class CounterAdapter(private val listener: OnOptionsCounterListener) :
         }
 
         abstract val id: String
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val filterResults = FilterResults()
+                if (constraint == null || constraint.isEmpty()) {
+                    filterResults.count = listCounterCopy.size
+                    filterResults.values = listCounterCopy
+                } else {
+                    val search = constraint.toString().lowercase()
+
+                    val userList = ArrayList<Counter>()
+                    for (item in listCounterCopy) {
+                        if (item.title!!.lowercase().contains(search)) {
+                            userList.add(item)
+                        }
+                    }
+                    filterResults.count = userList.size
+                    filterResults.values = userList
+                }
+                return filterResults
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                val list = results!!.values as ArrayList<Counter>
+                addHeaderAndSubmitList(list)
+                notifyItemRangeChanged(0, list.size)
+            }
+
+        }
     }
 
 
